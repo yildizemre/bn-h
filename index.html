@@ -3,56 +3,792 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>HypeVision · Sunumlar</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%231f2226'/%3E%3Cpath d='M4 18h16M4 15l4-4 4 3 5-7' fill='none' stroke='%23F5B301' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>HypeVision · Bankacılık Sunumu</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%231f2226'/%3E%3Cpath d='M4 18h16M4 15l4-4 4 3 5-7' fill='none' stroke='%23F5B301' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Serif+4:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
 <style>
+:root{
+  --line:#ece5d6;--ink:#1f2226;--soft:#5c626b;--faint:#949aa2;
+  --yellow:#F5B301;--amber:#C8890F;--yellow-wash:#fcf1ce;--eye:#9a6b08;
+  --ok:#1a9a5f;--ok-bg:#e7f7ee;--hot:#c0392b;--hot-bg:#fdeae7;--blue:#2f6ec7;
+  --f-head:"Source Serif 4",Georgia,serif;--f-ui:"Manrope",system-ui,sans-serif;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{min-height:100%;background:#0f1012;font-family:Manrope,system-ui,sans-serif;color:#1f2226}
-body{display:grid;place-items:center;padding:24px;background:radial-gradient(720px 380px at 88% -8%,rgba(245,179,1,.18),transparent 60%),#0f1012}
-.wrap{width:min(720px,100%)}
-.logo{display:flex;align-items:center;gap:10px;margin-bottom:18px;color:#f3ecdc}
-.mk{width:36px;height:36px;border-radius:10px;background:#1f2226;display:grid;place-items:center;border:1px solid #2a2f37}
-.wm{font-weight:800;font-size:20px;letter-spacing:-.03em}
-.wm b{color:#C8890F}
-h1{font-family:"Source Serif 4",Georgia,serif;font-size:32px;line-height:1.15;color:#faf5e8;margin-bottom:8px}
-p{color:#a7adb6;font-weight:500;margin-bottom:22px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-a.card{display:block;text-decoration:none;color:#1f2226;background:#faf5e8;border-radius:18px;padding:22px 20px;box-shadow:0 16px 36px -18px rgba(0,0,0,.5)}
-a.card .k{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#C8890F;margin-bottom:8px}
-a.card .t{font-family:"Source Serif 4",Georgia,serif;font-size:22px;font-weight:700;margin-bottom:8px}
-a.card .d{font-size:13.5px;color:#5c626b;line-height:1.45}
-a.card .go{margin-top:16px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:#1f2226;background:#F5B301;padding:9px 12px;border-radius:10px}
-@media (max-width:640px){
-  h1{font-size:26px}
-  .grid{grid-template-columns:1fr}
+html,body{height:100%;background:#0f1012;font-family:var(--f-ui);color:var(--ink);-webkit-font-smoothing:antialiased;overflow:hidden}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+@keyframes blip{0%,55%{opacity:1}56%,100%{opacity:.25}}
+.fu{animation:fadeUp .55s ease both}
+.stage-wrap{position:fixed;inset:0;display:grid;place-items:center}
+.stage{width:min(100vw,calc((100vh - 0px) * 16 / 9));height:min(100vh,calc(100vw * 9 / 16));position:relative;overflow:hidden;background:radial-gradient(720px 380px at 88% -8%,rgba(245,179,1,.22),transparent 60%),linear-gradient(180deg,#faf5e8,#f3ecd6)}
+.slide{position:absolute;inset:0;padding:48px 40px 64px;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateX(28px);transition:opacity .38s ease,transform .38s ease}
+.slide.on{opacity:1;pointer-events:auto;transform:none}
+.slide.cover{background:radial-gradient(760px 420px at 86% -10%,rgba(245,179,1,.28),transparent 58%),radial-gradient(520px 340px at -8% 110%,rgba(245,179,1,.1),transparent 58%),linear-gradient(180deg,#faf5e8,#f4eed9)}
+.brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex:0 0 auto}
+.logo{display:flex;align-items:center;gap:10px}
+.logo .mk{width:32px;height:32px;border-radius:9px;background:#1f2226;display:grid;place-items:center}
+.logo .mk svg{width:18px;height:18px}
+.logo .wm{font-weight:800;font-size:16px;letter-spacing:-.02em}
+.logo .wm .b{color:var(--amber)}
+.site{font-size:11px;color:var(--faint);font-weight:700}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--eye);background:var(--yellow-wash);padding:6px 12px;border-radius:100px;margin-bottom:12px}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--yellow)}
+h1{font-family:var(--f-head);font-weight:700;font-size:34px;line-height:1.08;letter-spacing:-.02em;margin-bottom:10px;text-wrap:balance}
+h1 .amb{color:var(--amber)}
+.lead{font-size:15px;line-height:1.55;color:var(--soft);font-weight:500;max-width:62ch;margin-bottom:18px}
+.lead b{color:var(--ink);font-weight:700}
+.khero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.khero .big{width:86px;height:86px;border-radius:24px;background:#1f2226;display:grid;place-items:center;box-shadow:0 20px 44px -14px rgba(31,34,38,.5);margin-bottom:18px;animation:floaty 5s ease-in-out infinite}
+.khero .big svg{width:44px;height:44px}
+.khero .wm{font-family:var(--f-head);font-weight:700;font-size:36px;letter-spacing:-.03em}
+.khero .wm .b{color:var(--amber)}
+.khero .tag{font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);margin:6px 0 22px}
+.khero h1{font-size:40px;max-width:16ch}
+.khero .lead{max-width:42ch;margin-inline:auto}
+.kswipe{margin-top:22px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:var(--amber)}
+.kswipe svg{width:17px;height:17px;animation:nudge 1.4s ease-in-out infinite}
+.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;flex:1;min-height:0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 6px 18px rgba(40,42,35,.05)}
+.ic{width:36px;height:36px;border-radius:11px;background:var(--yellow-wash);display:grid;place-items:center;flex:0 0 auto}
+.ic svg{width:18px;height:18px;color:var(--amber)}
+.ic.dark{background:#1f2226}
+.ic.dark svg{color:var(--yellow)}
+.gt{font-size:14.5px;font-weight:800;line-height:1.25}
+.gs{font-size:12.5px;color:var(--soft);font-weight:500;margin-top:4px;line-height:1.45}
+.gain{display:flex;gap:12px;align-items:flex-start}
+.tcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 6px 18px rgba(40,42,35,.05)}
+.tchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.tchips .c{font-size:12px;font-weight:700;color:var(--amber);background:var(--yellow-wash);padding:6px 11px;border-radius:100px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 6px 18px rgba(40,42,35,.05);position:relative}
+.step .node{width:46px;height:46px;border-radius:13px;background:#1f2226;display:grid;place-items:center;margin-bottom:12px}
+.step .node svg{width:22px;height:22px}
+.step .no{position:absolute;top:16px;right:16px;width:22px;height:22px;border-radius:7px;background:var(--amber);color:#fff;font-family:var(--f-head);font-weight:700;font-size:12px;display:grid;place-items:center}
+.step .st{font-size:16px;font-weight:800;margin-bottom:6px}
+.step .sd{font-size:13px;line-height:1.5;color:var(--soft);font-weight:500}
+.step .sd b{color:var(--ink)}
+.trust{display:flex;gap:10px;margin-top:14px}
+.tcell{flex:1;background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 10px;text-align:center;box-shadow:0 3px 12px rgba(40,42,35,.04)}
+.tcell .ti{width:26px;height:26px;margin:0 auto 7px;border-radius:8px;background:var(--yellow-wash);display:grid;place-items:center}
+.tcell .ti svg{width:15px;height:15px;color:var(--amber)}
+.tcell .tt{font-size:12px;font-weight:800}
+.close{display:flex;align-items:center;gap:13px;background:#1f2226;border-radius:16px;padding:14px 18px;margin-top:14px;box-shadow:0 14px 30px -14px rgba(31,34,38,.55)}
+.close .ci{width:36px;height:36px;border-radius:11px;background:var(--yellow);display:grid;place-items:center;flex:0 0 auto}
+.close .ci svg{width:18px;height:18px}
+.close .ct{font-size:14px;font-weight:600;color:#f3ecdc}
+.close .ct b{color:var(--yellow);font-weight:800}
+.mod{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 14px rgba(40,42,35,.04);cursor:pointer;transition:transform .2s,box-shadow .2s}
+.mod:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(40,42,35,.08)}
+.mod .num{width:32px;height:32px;border-radius:9px;background:var(--yellow-wash);display:grid;place-items:center;font-family:var(--f-head);font-weight:700;color:var(--amber);margin-bottom:10px}
+.mod .nm{font-size:14px;font-weight:800;line-height:1.25;margin-bottom:6px}
+.mod .md{font-size:12px;color:var(--soft);line-height:1.4}
+.feat{display:flex;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:0 4px 14px rgba(40,42,35,.04)}
+.pcard{background:#1f2226;border-radius:18px;padding:16px 18px;box-shadow:0 18px 38px -16px rgba(31,34,38,.55);color:#fff}
+.pcard .ph{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.pcard .ph .pi{width:32px;height:32px;border-radius:10px;background:var(--yellow);display:grid;place-items:center}
+.pcard .ph .pi svg{width:17px;height:17px;color:#1f2226}
+.pcard .ph .pt{font-size:14px;font-weight:800}
+.live{margin-left:auto;font-size:10.5px;font-weight:800;color:#7ee0a8;display:inline-flex;align-items:center;gap:5px}
+.live .d{width:7px;height:7px;border-radius:50%;background:#3fcf7f;box-shadow:0 0 0 3px rgba(63,207,127,.2)}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pm{background:#2a2f37;border-radius:12px;padding:11px 12px}
+.pm .v{font-family:var(--f-head);font-weight:700;font-size:22px;line-height:1}
+.pm .v .u{font-size:12px;color:var(--yellow)}
+.pm .l{font-size:10.5px;color:#a7adb6;font-weight:600;margin-top:5px;text-transform:uppercase;letter-spacing:.04em}
+.spark{height:28px;margin-top:8px;display:block;width:100%}
+.feed{background:#fff;border:1px solid var(--line);border-radius:16px;padding:6px 16px;box-shadow:0 4px 14px rgba(40,42,35,.05)}
+.frow{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)}
+.frow:last-child{border-bottom:none}
+.frow .fd{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.frow .fd.r{background:#E0483A;box-shadow:0 0 0 3px rgba(224,72,58,.15)}
+.frow .fd.a{background:#F5B301;box-shadow:0 0 0 3px rgba(245,179,1,.18)}
+.frow .fd.b{background:#3a7bd5;box-shadow:0 0 0 3px rgba(58,123,213,.15)}
+.frow .ft{flex:1;font-size:13px;font-weight:600}
+.frow .ft b{font-weight:800}
+.frow .fm{font-size:11px;color:var(--faint);font-weight:700}
+.rbac{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rb{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 14px rgba(40,42,35,.04)}
+.rb .who{font-size:14px;font-weight:800;margin:8px 0 4px}
+.rb .see{font-size:12.5px;color:var(--soft);line-height:1.45}
+.phase{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.act{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.act .n{width:28px;height:28px;border-radius:8px;background:var(--amber);color:#fff;font-family:var(--f-head);font-weight:700;display:grid;place-items:center;margin-bottom:10px}
+.cta{display:inline-flex;align-items:center;gap:9px;background:var(--yellow);color:#1f2226;font-weight:800;font-size:15px;padding:13px 18px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 12px 26px -10px rgba(245,179,1,.7)}
+.cta svg{width:18px;height:18px}
+.contact a{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;text-decoration:none;color:#1f2226;margin-bottom:10px;box-shadow:0 4px 14px rgba(40,42,35,.05)}
+.contact .cix{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:0 0 auto}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 14px 15px;box-shadow:0 4px 14px rgba(40,42,35,.04)}
+.kpi .kv{font-family:var(--f-head);font-weight:700;font-size:28px;line-height:1;letter-spacing:-.02em}
+.kpi .kv em{font-style:normal;color:var(--amber);font-size:15px}
+.kpi .kl{font-size:13px;font-weight:800;margin-top:8px}
+.kpi .kd{font-size:11.5px;color:var(--soft);font-weight:500;margin-top:3px;line-height:1.35}
+.how{list-style:none;display:flex;flex-direction:column;gap:8px;margin:0}
+.how li{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.4;color:var(--soft);font-weight:500}
+.how li b{color:var(--ink);font-weight:800}
+.how .hn{width:22px;height:22px;border-radius:7px;background:var(--amber);color:#fff;font-family:var(--f-head);font-weight:700;font-size:12px;display:grid;place-items:center;flex:0 0 auto}
+.split-shot{display:grid;grid-template-columns:.4fr .6fr;gap:16px;flex:1;min-height:0;align-items:stretch}
+.shot{background:#111318;border-radius:14px;overflow:hidden;box-shadow:0 16px 36px -16px rgba(31,34,38,.55);min-height:0;display:flex;border:1px solid #2a2f37}
+.shot img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+.shots2{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;min-height:0}
+.shots3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;flex:1;min-height:0}
+.map{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.map .m{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 14px;box-shadow:0 4px 14px rgba(40,42,35,.04)}
+.map .g{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+.slide.tight h1{font-size:26px;margin-bottom:8px}
+.slide.tight .lead{margin-bottom:12px;font-size:13.5px}
+.snav .grp{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#9aa3ad;padding:10px 10px 4px}
+.topbar{position:absolute;top:0;left:0;right:0;z-index:20;padding:10px 40px 8px;display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,rgba(250,245,232,.96),rgba(250,245,232,.55));pointer-events:none}
+.topbar .sec{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--amber)}
+.topbar .cnt{margin-left:auto;font-size:11px;font-weight:700;color:var(--faint)}
+.prog{position:absolute;top:36px;left:40px;right:40px;height:2px;background:rgba(31,34,38,.08);z-index:20}
+.prog .bar{height:100%;width:0;background:var(--yellow);transition:width .25s ease}
+.navbar{position:absolute;bottom:0;left:0;right:0;z-index:20;padding:8px 28px 10px;display:flex;gap:8px;background:linear-gradient(0deg,rgba(250,245,232,.97),rgba(250,245,232,.7));border-top:1px solid var(--line)}
+.navbar .nb{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 6px;border-radius:12px;cursor:pointer;border:none;background:transparent;font-family:var(--f-ui)}
+.navbar .nb .ni{width:16px;height:16px;color:var(--faint)}
+.navbar .nb .nl{font-size:12px;font-weight:800;color:var(--faint)}
+.navbar .nb.on{background:#1f2226}
+.navbar .nb.on .ni{color:var(--yellow)}
+.navbar .nb.on .nl{color:#fff}
+.hint{position:absolute;right:18px;bottom:58px;z-index:15;font-size:10.5px;font-weight:700;color:var(--faint)}
+body.pa-open .topbar,body.pa-open .prog,body.pa-open .navbar,body.pa-open .hint,body.pa-open .phonenav,body.pa-open .stage > .slide{display:none!important}
+#panelApp{display:none;position:absolute;inset:0;z-index:50;background:#fff;flex-direction:column}
+#panelApp.on{display:flex}
+.livebar{height:46px;flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:0 14px;background:#fff;border-bottom:1px solid #e8edf2}
+.lb-brand{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800}
+.lb-brand span{font-weight:600;color:#6b7280}
+.lb-link{margin-left:auto;font-size:12px;font-weight:800;color:#C8890F;text-decoration:none}
+#panelFrame{flex:1;width:100%;border:0;background:#f4f6f8}
+.dash{display:flex;width:100%;height:100%}
+.side{width:220px;background:#fff;border-right:1px solid #e8edf2;padding:16px 12px;display:flex;flex-direction:column}
+.side .slogo{display:flex;align-items:center;gap:8px;padding:4px 8px 18px;font-weight:800;font-size:15px;letter-spacing:-.03em}
+.side .slogo b{color:#111}
+.snav{display:flex;flex-direction:column;gap:2px}
+.snav button{display:flex;align-items:center;gap:9px;width:100%;border:none;background:transparent;text-align:left;padding:9px 10px;border-radius:10px;font:600 12.5px var(--f-ui);color:#5b6470;cursor:pointer}
+.snav button svg{width:15px;height:15px;flex:0 0 auto}
+.snav button.on{background:#eef2ff;color:#1f2226}
+.side .meta{margin-top:auto;padding:10px;font-size:11px;color:#8b939c;line-height:1.4}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.dtop{height:52px;background:#fff;border-bottom:1px solid #e8edf2;display:flex;align-items:center;padding:0 22px;gap:12px;font-size:13px;font-weight:700}
+.dtop .crumb{color:#6b7280;font-weight:600}
+.dtop .sp{margin-left:auto;display:flex;align-items:center;gap:10px}
+.dotg{width:8px;height:8px;border-radius:50%;background:#22c55e}
+.xbtn{width:32px;height:32px;border-radius:9px;border:1px solid #e5e7eb;background:#fff;display:grid;place-items:center;cursor:pointer}
+.bodyx{flex:1;overflow:auto;padding:22px 24px}
+.dkpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.dk{background:#fff;border:1px solid #eef1f4;border-radius:14px;padding:14px 16px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.dk .l{font-size:11px;color:#6b7280;font-weight:700;margin-bottom:8px}
+.dk .v{font-size:26px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.dk .s{font-size:11px;color:#16a34a;font-weight:700;margin-top:6px}
+.dk .s.w{color:#b5820a}
+.dgrid{display:grid;grid-template-columns:1.4fr .8fr;gap:12px}
+.dcard{background:#fff;border:1px solid #eef1f4;border-radius:14px;padding:16px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.dcard h3{font-size:14px;font-weight:800;margin-bottom:4px}
+.dcard p{font-size:12px;color:#6b7280;margin-bottom:12px}
+table.dt{width:100%;border-collapse:collapse;font-size:12.5px}
+table.dt th{text-align:left;color:#6b7280;font-weight:700;padding:8px 6px;border-bottom:1px solid #eef1f4}
+table.dt td{padding:9px 6px;border-bottom:1px solid #f3f4f6;font-weight:600}
+.chip{display:inline-block;font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:100px}
+.ok{background:#e7f7ee;color:#1a9a5f}.ww{background:#fcf1ce;color:#b5820a}.rr{background:#fdeae7;color:#c0392b}
+.ptab{display:none}.ptab.on{display:block;animation:fadeUp .35s ease both}
+.bars{display:flex;flex-direction:column;gap:10px}
+.barrow{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700}
+.barrow i{flex:1;height:10px;border-radius:99px;background:#f1f5f9;overflow:hidden}
+.barrow i b{display:block;height:100%;border-radius:99px}
+@media (max-width:1100px){
+  h1{font-size:28px}.khero h1{font-size:32px}
+  .slide{padding:22px 22px 60px}
+  .grid2,.phase{grid-template-columns:1fr}
+  .grid5,.act,.kpis,.shots3,.map{grid-template-columns:repeat(2,1fr)}
+  .split-shot,.shots2{grid-template-columns:1fr}
+  .shot{max-height:220px}
+  .side{display:none}
+}
+.phonenav{display:none}
+.kswipe-phone{display:none}
+@media (max-width:820px){
+  html,body{height:100%;height:100dvh;overflow:hidden}
+  .stage-wrap{position:fixed;inset:0;display:block}
+  .stage{width:100%;height:100%;height:100dvh;overflow:hidden}
+  .slide{padding:54px 16px calc(96px + env(safe-area-inset-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch;transform:none}
+  .slide.on{transform:none}
+  .brand{margin-bottom:10px}
+  .site{display:none}
+  h1{font-size:24px}
+  .slide.tight h1{font-size:22px}
+  .khero h1{font-size:26px}
+  .khero .wm{font-size:28px}
+  .khero .big{width:64px;height:64px;border-radius:18px;margin-bottom:12px}
+  .khero .big svg{width:32px;height:32px}
+  .khero .tag{letter-spacing:.1em;margin:4px 0 14px}
+  .lead{font-size:14px;margin-bottom:14px}
+  .grid2,.grid3,.grid4,.grid5,.kpis,.steps,.phase,.act,.map,.shots2,.shots3,.split-shot,.rbac,.pgrid{grid-template-columns:1fr!important}
+  .trust{flex-wrap:wrap}
+  .tcell{flex:1 1 42%}
+  .shot{max-height:220px;min-height:150px}
+  .shots2 .shot,.shots3 .shot{height:180px!important;max-height:180px}
+  .topbar{padding:10px 16px 8px}
+  .prog{left:16px;right:16px;top:36px}
+  .navbar{padding:6px 8px calc(8px + env(safe-area-inset-bottom))}
+  .navbar .nb{flex-direction:column;gap:2px;padding:8px 4px;min-height:52px}
+  .navbar .nl{font-size:10px}
+  .hint{display:none}
+  .kswipe-desk{display:none}
+  .kswipe-phone{display:inline}
+  .phonenav{display:flex;position:absolute;right:12px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:25;gap:8px}
+  .phonenav .pn{width:46px;height:46px;border-radius:13px;border:0;background:#1f2226;color:#fff;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 10px 22px rgba(31,34,38,.28)}
+  .close{align-items:flex-start}
+  .cta{width:100%;justify-content:center}
+  .kpi .kv{font-size:24px}
+  .livebar{flex-wrap:wrap;height:auto;padding:8px 12px;gap:8px}
+  .lb-link{margin-left:0}
 }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="logo">
-    <div class="mk"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div>
-    <div class="wm">Hype<b>Vision</b></div>
+<div class="stage-wrap">
+<div class="stage" id="stage">
+  <div class="topbar"><span class="sec" id="secLbl">Giriş</span><span class="cnt" id="cnt">1 / 22</span></div>
+  <div class="prog"><div class="bar" id="pbar"></div></div>
+
+  <!-- 0 COVER -->
+  <section class="slide cover on" data-sec="giris">
+    <div class="brand fu">
+      <div class="logo">
+        <div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/><circle cx="8" cy="12" r="1.2" fill="#F5B301" stroke="none"/><circle cx="17" cy="8" r="1.4" fill="#F5B301" stroke="none"/></svg></div>
+        <div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div>
+      </div>
+      <div class="site">HypeVision · Bankacılık Güvenlik ve Operasyonel Zeka</div>
+    </div>
+    <div class="khero">
+      <div class="big fu"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/><circle cx="8" cy="12" r="1.3" fill="#F5B301" stroke="none"/><circle cx="17" cy="8" r="1.5" fill="#F5B301" stroke="none"/></svg></div>
+      <div class="wm fu" style="animation-delay:.06s"><span class="a">Hype</span><span class="b">Vision</span></div>
+      <div class="tag fu" style="animation-delay:.1s">Bankacılık Güvenlik ve Operasyonel Zeka</div>
+      <h1 class="fu" style="animation-delay:.16s">İyi yönetilen şube,<br><span class="amb">gören</span> şubedir</h1>
+      <p class="lead fu" style="animation-delay:.22s">Mevcut CCTV altyapınız, derin öğrenme ile pasif izlemeden aktif güvenlik ve veri üretim merkezine dönüşür.</p>
+      <div class="kswipe fu" style="animation-delay:.3s"><span class="kswipe-desk">Sunuma geçmek için ok tuşunu kullanın</span><span class="kswipe-phone">Kaydırarak devam edin</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </div>
+  </section>
+
+  <!-- 1 NEDİR -->
+  <section class="slide" data-sec="giris">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2" stroke-linecap="round"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">HypeVision</div></div>
+    <div class="eyebrow"><span class="dot"></span>HypeVision Nedir?</div>
+    <h1>Şube ve ATM ağınız için geliştirilmiş bir <span class="amb">yapay zekâ görüş sistemi</span></h1>
+    <p class="lead">HypeVision, bankalar için özel geliştirilmiş bir çözümdür. Mevcut kameralarınızı güvenlik risklerini anlık tespit eden, operasyonel verimliliği ölçen ve yönetimsel rapor üreten otonom bir yapıya dönüştürür.</p>
+    <div class="grid2">
+      <div class="tcard">
+        <div class="gain" style="margin-bottom:8px">
+          <div class="ic dark"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/></svg></div>
+          <div><div class="gt">HypeVision teknolojisi</div><div class="gs">Derin öğrenme · bilgisayarlı görü · anlık alarm</div></div>
+        </div>
+        <div class="tchips">
+          <span class="c">Kara liste</span><span class="c">Yüz tanıma</span><span class="c">Kuyruk KPI</span><span class="c">Açık nakit</span><span class="c">ATM tehdidi</span><span class="c">KVKK-uyumlu</span>
+        </div>
+      </div>
+      <div class="pcard">
+        <div class="ph"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v14H3zM8 21h8M12 17v4"/></svg></div><div class="pt">Doğrudan uygulama</div><div class="live"><span class="d"></span>Aktif</div></div>
+        <div class="pgrid">
+          <div class="pm"><div class="v">1,4<span class="u"> sn</span></div><div class="l">Kapıdan pop-up’a</div></div>
+          <div class="pm"><div class="v">%99,3</div><div class="l">Yüz tanıma doğruluğu</div></div>
+          <div class="pm"><div class="v">%5,7</div><div class="l">Yanlış alarm oranı</div></div>
+          <div class="pm"><div class="v">%94,8</div><div class="l">SLA uyum hedef üstü</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 ÖZET -->
+  <section class="slide" data-sec="giris">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Yönetici Özeti</div></div>
+    <div class="eyebrow"><span class="dot"></span>Yönetici Özeti</div>
+    <h1>Kamerayı izlemek değil, <span class="amb">karar üretmek</span></h1>
+    <p class="lead">Sistem, şube ve ATM ağındaki mevcut CCTV altyapısını yapay zekâ ile aktif güvenlik ve veri üretim merkezine çevirir. Hedef: riski işlem olmadan yakalamak, kuyruğu ölçmek, nakit ve ATM güvenliğini otonom izlemek.</p>
+    <div class="grid3">
+      <div class="card gain"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="gt">Aktif güvenlik</div><div class="gs">Kara listedeki kişi şubeye girdiği anda, henüz işlem yapmadan pop-up alarm.</div></div></div>
+      <div class="card gain"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 4-5"/></svg></div><div><div class="gt">Operasyonel zeka</div><div class="gs">Bekleme süresi, gişe etkileşimi ve SLA takibi tek ekranda.</div></div></div>
+      <div class="card gain"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><div><div class="gt">Yönetimsel rapor</div><div class="gs">Genel müdürlükten şube müdürüne kadar RBAC ile yetkilendirilmiş görünüm.</div></div></div>
+    </div>
+    <div class="close"><div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="#1f2226" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg></div><div class="ct">Strateji: <b>doğrudan uygulama</b>. Yeni kamera yatırımı yok, hat durmaz, veri bankanın sunucusunda kalır.</div></div>
+  </section>
+
+  <!-- 3 KPI -->
+  <section class="slide" data-sec="giris">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Yönetim KPI’ları</div></div>
+    <div class="eyebrow"><span class="dot"></span>Ölçülen Değerler</div>
+    <h1>Yönetim kuruluna gidecek <span class="amb">tek bakış KPI’lar</span></h1>
+    <p class="lead">Panel her sabah aynı dört soruyu cevaplar: kim girdi, kuyruk nerde, nakit açıkta mı, ATM’de tehdit var mı?</p>
+    <div class="kpis" style="margin-bottom:12px">
+      <div class="kpi"><div class="kv">1,4 <em>sn</em></div><div class="kl">Kapıdan alarma</div><div class="kd">Kara liste eşleşmesi işlem başlamadan pop-up olarak düşer.</div></div>
+      <div class="kpi"><div class="kv">%99,3</div><div class="kl">Yüz tanıma doğruluğu</div><div class="kd">Faz 1 kamera kalibrasyonu sonrası hedef eşik.</div></div>
+      <div class="kpi"><div class="kv">%5,7</div><div class="kl">Yanlış alarm oranı</div><div class="kd">Klasik hareket algılamaya göre operatör yükü düşük kalır.</div></div>
+      <div class="kpi"><div class="kv">60 <em>sn</em></div><div class="kl">Sahipsiz nakit eşiği</div><div class="kd">Vezne üstünde kalan para için sessiz alarm süresi.</div></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="kv">7,4 <em>dk</em></div><div class="kl">Ağ ort. bekleme</div><div class="kd">KPI eşiği 10 dk. Aşım anında operasyon uyarılır.</div></div>
+      <div class="kpi"><div class="kv">%94,8</div><div class="kl">SLA uyum oranı</div><div class="kd">Hedef %92. Gişe etkileşim süresi ile birlikte izlenir.</div></div>
+      <div class="kpi"><div class="kv">5.425</div><div class="kl">Net ziyaretçi / gün</div><div class="kd">6 şube toplamı. Personel trafiği sayımdan düşülür.</div></div>
+      <div class="kpi"><div class="kv">28</div><div class="kl">Alarm / 24 saat</div><div class="kd">4 dolandırıcılık · 13 operasyon · 5 nakit · 6 ATM.</div></div>
+    </div>
+  </section>
+
+  <!-- 4 RİSKLER -->
+  <section class="slide" data-sec="giris">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Görünmeyen riskler</div></div>
+    <div class="eyebrow"><span class="dot"></span>Görünmeyen Riskler</div>
+    <h1>Fark etmediğiniz her saniye, <span class="amb">şubeden çalar</span></h1>
+    <p class="lead">Bir banka, göremediğini iyileştiremez. En pahalı kayıplar ve riskler, kimsenin bakmadığı yerde birikir.</p>
+    <div class="grid2" style="grid-template-columns:1fr 1fr">
+      <div class="card gain"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/><path d="M19 8l2 2-2 2"/></svg></div><div><div class="gt">Riskli kişi şubeye girer, kimse fark etmez</div><div class="gs">Sahte kimlik ve dolandırıcılık geçmişi, işlem başlayana kadar görünmez kalır.</div></div></div>
+      <div class="card gain"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><div class="gt">Kuyruk uzar, SLA kaçar</div><div class="gs">Bekleme ve gişe ilgilenme süresi ölçülemeyince personel planı tahmine kalır.</div></div></div>
+      <div class="card gain"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V6a5 5 0 0 1 10 0v2"/></svg></div><div><div class="gt">Bankoda sahipsiz nakit</div><div class="gs">Vezne üzerinde kalan para, sessizce risk üretir; kayıt ancak olaydan sonra izlenir.</div></div></div>
+      <div class="card gain"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M8 8V6h8v2"/></svg></div><div><div class="gt">ATM kabininde unutulan paket, levye, barınma</div><div class="gs">Sahipsiz çanta, saldırı aracı ve uzun süre hareketsiz kişi klasik hareket algılamayla kaçırılır.</div></div></div>
+    </div>
+  </section>
+
+  <!-- 4 3 ADIM -->
+  <section class="slide" data-sec="giris">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Çalışma prensibi</div></div>
+    <div class="eyebrow"><span class="dot"></span>Çalışma Prensibi</div>
+    <h1>Kurulum değil, <span class="amb">bağlantı.</span></h1>
+    <p class="lead">HypeVision yeni bir donanım projesi değildir. Şubede zaten olan IP kameraları üç adımda bankayı gören bir yapay zekâya dönüştürür.</p>
+    <div class="steps">
+      <div class="step"><span class="no">1</span><div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6a4 4 0 0 0 0-8H8a4 4 0 0 1 0-8h2"/></svg></div><div class="st">Bağlan</div><div class="sd">Mevcut <b>CCTV / IP kameralar</b> RTSP ile tanıtılır. Marka bağımsızdır: Hikvision, Dahua, Axis ve diğerleri.</div></div>
+      <div class="step"><span class="no">2</span><div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/></svg></div><div class="st">Analiz et</div><div class="sd">Görüntüler <b>on-premise</b> derin öğrenme motorunda işlenir. Yüz, kişi, nakit, paket ve tehdit nesnesi tanınır.</div></div>
+      <div class="step"><span class="no">3</span><div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M12 13a2 2 0 1 0 2-2M4 20a9 9 0 1 1 16 0"/></svg></div><div class="st">Yönet</div><div class="sd">Alarm, rapor ve trendler <b>tek panele</b> düşer. Kritik durumda e-posta / SMS, her seviyede RBAC erişimi.</div></div>
+    </div>
+    <div class="trust">
+      <div class="tcell"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div><div class="tt">Yeni donanım yok</div></div>
+      <div class="tcell"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg></div><div class="tt">Şube durmaz</div></div>
+      <div class="tcell"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="tt">KVKK-uyumlu</div></div>
+      <div class="tcell"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6"/></svg></div><div class="tt">On-premise</div></div>
+    </div>
+  </section>
+
+  <!-- 5 FAZ -->
+  <section class="slide" data-sec="giris">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Proje yönetimi</div></div>
+    <div class="eyebrow"><span class="dot"></span>Proje Yönetimi</div>
+    <h1>Başarı, sahadan <span class="amb">doğru veriyi</span> almakla başlar</h1>
+    <p class="lead">Yüz tanıma ve hassas nesne tespiti %99+ doğruluk için kamera açısı ve ışıklandırma kritiktir. Bu yüzden proje teknik analiz ve optimizasyonla açılır.</p>
+    <div class="phase">
+      <div class="card">
+        <div class="eyebrow" style="margin-bottom:10px"><span class="dot"></span>Faz 1</div>
+        <div class="gt" style="font-size:18px;margin-bottom:8px">Saha analizi ve kamera optimizasyonu</div>
+        <div class="gs">Mevcut kameralar yüz tanıma standartlarına uygun hale getirilir. Marka/modele göre çözünürlük, FPS, bitrate ve shutter ayarları analiz edilip raporlanır.</div>
+        <div class="tchips"><span class="c">Açı düzeltme</span><span class="c">Işıklandırma</span><span class="c">Config raporu</span></div>
+      </div>
+      <div class="card">
+        <div class="eyebrow" style="margin-bottom:10px"><span class="dot"></span>Faz 2</div>
+        <div class="gt" style="font-size:18px;margin-bottom:8px">Pilot lokasyon seçimi</div>
+        <div class="gs">İlk uygulama için müşteri yoğunluğu ve operasyonel hareketliliği yüksek, teknik altyapısı uygun stratejik bir şube banka yönetimi tarafından belirlenir.</div>
+        <div class="tchips"><span class="c">Yoğun şube</span><span class="c">Pilot canlıya alma</span><span class="c">Ölçekleme</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 MODÜL HARİTASI -->
+  <section class="slide" data-sec="modul">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">5 modül</div></div>
+    <div class="eyebrow"><span class="dot"></span>Modül Listesi</div>
+    <h1>Bankaya özel seçilmiş <span class="amb">beş zeka katmanı</span></h1>
+    <p class="lead">Her modül aynı motorda çalışır, aynı panele yazar. Genel müdürlük tek bakışta tüm ağı görür.</p>
+    <div class="grid5">
+      <div class="mod" onclick="go(8)"><div class="num">01</div><div class="nm">Dolandırıcılık Önleme</div><div class="md">KPI: 1,4 sn pop-up · %99,3 tanıma</div></div>
+      <div class="mod" onclick="go(9)"><div class="num">02</div><div class="nm">Müşteri İçgörüsü</div><div class="md">KPI: net sayım · personel hariç</div></div>
+      <div class="mod" onclick="go(10)"><div class="num">03</div><div class="nm">Operasyonel Verimlilik</div><div class="md">KPI: 10 dk bekleme · SLA %92</div></div>
+      <div class="mod" onclick="go(11)"><div class="num">04</div><div class="nm">Nakit ve Banko</div><div class="md">KPI: 60 sn sessiz nakit alarmı</div></div>
+      <div class="mod" onclick="go(12)"><div class="num">05</div><div class="nm">ATM ve Nesne</div><div class="md">KPI: paket · levye · barınma</div></div>
+    </div>
+  </section>
+
+  <!-- 7 M1 -->
+  <section class="slide" data-sec="modul">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Modül 01</div></div>
+    <div class="eyebrow"><span class="dot"></span>Modül 01 · Fraud Prevention</div>
+    <h1>Merkezi dolandırıcılık önleme ve <span class="amb">yüz tanıma ağı</span></h1>
+    <div class="grid2">
+      <div>
+        <div class="feat" style="margin-bottom:10px"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3"/><path d="M4 20a8 8 0 0 1 16 0"/><path d="M3 8h2M19 8h2"/></svg></div><div><div class="gt">Kara liste yönetimi</div><div class="gs">Sahte kimlik, dolandırıcılık geçmişi veya riskli kategorideki kişiler sisteme tanıtılır.</div></div></div>
+        <div class="feat" style="margin-bottom:10px"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div><div class="gt">Anlık pop-up alarm</div><div class="gs">Tanımlı kişi şubeye girdiği anda — henüz işlem yapmadan — güvenlik ve şube müdürüne düşer.</div></div></div>
+        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/></svg></div><div><div class="gt">Kamera açısına bağlı doğruluk</div><div class="gs">Bu modülün başarısı Faz 1’deki açı ve ışık düzenlemesine doğrudan bağlıdır.</div></div></div>
+      </div>
+      <div>
+        <div class="pcard" style="margin-bottom:10px">
+          <div class="ph"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="pt">Kara liste ağı</div><div class="live"><span class="d"></span>Canlı</div></div>
+          <div class="pgrid">
+            <div class="pm"><div class="v">1.904</div><div class="l">Kara liste kaydı</div></div>
+            <div class="pm"><div class="v">4</div><div class="l">Bugün eşleşme</div></div>
+            <div class="pm"><div class="v">1,4<span class="u"> sn</span></div><div class="l">İşlem öncesi uyarı</div></div>
+            <div class="pm"><div class="v">%99,3</div><div class="l">Tanıma doğruluğu</div></div>
+          </div>
+        </div>
+        <div class="feed">
+          <div class="frow"><span class="fd r"></span><div class="ft"><b>Kara liste eşleşmesi</b> · giriş kamerası</div><div class="fm">10:14</div></div>
+          <div class="frow"><span class="fd a"></span><div class="ft"><b>Pop-up</b> güvenlik birimine iletildi</div><div class="fm">10:14</div></div>
+          <div class="frow"><span class="fd b"></span><div class="ft"><b>Şube müdürü</b> bildirim aldı</div><div class="fm">10:15</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 M2 -->
+  <section class="slide" data-sec="modul">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Modül 02</div></div>
+    <div class="eyebrow"><span class="dot"></span>Modül 02 · Customer Insight</div>
+    <h1>Şube içi <span class="amb">müşteri içgörüsü</span></h1>
+    <div class="grid2">
+      <div>
+        <div class="feat" style="margin-bottom:10px"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1M16 4a3 3 0 0 1 0 6"/></svg></div><div><div class="gt">Net kişi sayım</div><div class="gs">Şubeye giren-çıkan müşteri trafiği, personel trafiğinden ayrıştırılarak net sayılır.</div></div></div>
+        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18"/></svg></div><div><div class="gt">Demografik analiz</div><div class="gs">Yaş aralığı ve cinsiyet dağılımı yapay zekâ ile raporlanır; şube planlamasına veri olur.</div></div></div>
+      </div>
+      <div class="pcard">
+        <div class="ph"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 4-5"/></svg></div><div class="pt">Bugünkü şube</div><div class="live"><span class="d"></span>Canlı</div></div>
+        <div class="pgrid">
+          <div class="pm"><div class="v">642</div><div class="l">Net müşteri / şube</div></div>
+          <div class="pm"><div class="v">49</div><div class="l">Personel (hariç)</div></div>
+          <div class="pm"><div class="v">12:00</div><div class="l">Yoğunluk saati</div></div>
+          <div class="pm"><div class="v">46/54</div><div class="l">Kadın / erkek</div></div>
+        </div>
+        <svg class="spark" viewBox="0 0 220 36" preserveAspectRatio="none"><path d="M0 28 C20 26 30 18 50 16 C70 14 80 20 100 12 C120 6 140 14 160 10 C180 7 200 16 220 8" fill="none" stroke="#F5B301" stroke-width="2.2"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 M3 -->
+  <section class="slide" data-sec="modul">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Modül 03</div></div>
+    <div class="eyebrow"><span class="dot"></span>Modül 03 · Operational Efficiency</div>
+    <h1>Kuyruk, bekleme ve <span class="amb">SLA takibi</span></h1>
+    <div class="grid2">
+      <div>
+        <div class="feat" style="margin-bottom:10px"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><div class="gt">Kuyruk ve bekleme analizi</div><div class="gs">Gişe önü ve bekleme alanında geçen süre ölçülür. KPI eşiği aşıldığında operasyon yöneticisine uyarı gider.</div></div></div>
+        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M2 20a6 6 0 0 1 12 0M14 20a5 5 0 0 1 8 0"/></svg></div><div><div class="gt">Personel / müşteri etkileşimi</div><div class="gs">Gişe personelinin ilgilenme süresi analiz edilir; hizmet kalitesi metrikleri (SLA) çıkarılır.</div></div></div>
+      </div>
+      <div class="pcard">
+        <div class="ph"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg></div><div class="pt">Gişe performansı</div><div class="live"><span class="d"></span>KPI 10 dk</div></div>
+        <div class="pgrid">
+          <div class="pm"><div class="v">8,9<span class="u"> dk</span></div><div class="l">Ort. bekleme</div></div>
+          <div class="pm"><div class="v">4</div><div class="l">KPI aşım saati</div></div>
+          <div class="pm"><div class="v">4:31<span class="u"> dk</span></div><div class="l">Gişe etkileşimi</div></div>
+          <div class="pm"><div class="v">%94,8</div><div class="l">SLA · hedef %92</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 M4 -->
+  <section class="slide" data-sec="modul">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Modül 04</div></div>
+    <div class="eyebrow"><span class="dot"></span>Modül 04 · Cash Security</div>
+    <h1>Nakit ve banko <span class="amb">güvenliği</span></h1>
+    <div class="grid2">
+      <div>
+        <div class="feat" style="margin-bottom:10px"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="12" rx="2"/><path d="M6 7V5h12v2M12 11v4"/></svg></div><div><div class="gt">Açıkta kalan nakit</div><div class="gs">Banko üzerinde para belirli bir süreden fazla sahipsiz bırakılırsa sessiz alarm üretilir. Müşteri görmez, güvenlik görür.</div></div></div>
+        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v14H3z"/><circle cx="12" cy="10" r="3"/></svg></div><div><div class="gt">Banko durumu</div><div class="gs">Her vezne için kamera görünümü, olay sayısı ve son sahipsiz nakit süresi tek kartta özetlenir.</div></div></div>
+      </div>
+      <div>
+        <div class="pcard" style="margin-bottom:10px">
+          <div class="ph"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="12" rx="2"/></svg></div><div class="pt">Vezne özeti</div><div class="live"><span class="d"></span>Sessiz izleme</div></div>
+          <div class="pgrid">
+            <div class="pm"><div class="v">8</div><div class="l">Sahipsiz nakit / hf</div></div>
+            <div class="pm"><div class="v">60<span class="u"> sn</span></div><div class="l">Sessiz alarm eşiği</div></div>
+            <div class="pm"><div class="v">2:18<span class="u"> dk</span></div><div class="l">En uzun açık nakit</div></div>
+            <div class="pm"><div class="v">0</div><div class="l">İhlalsiz gün serisi</div></div>
+          </div>
+        </div>
+        <div class="feed">
+          <div class="frow"><span class="fd a"></span><div class="ft"><b>Banka 2</b> · sahipsiz nakit 74 sn</div><div class="fm">14:05</div></div>
+          <div class="frow"><span class="fd b"></span><div class="ft"><b>Banka 1</b> · normale döndü</div><div class="fm">13:42</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 M5 -->
+  <section class="slide" data-sec="modul">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Modül 05</div></div>
+    <div class="eyebrow"><span class="dot"></span>Modül 05 · ATM & Object Security</div>
+    <h1>ATM kabini ve <span class="amb">nesne güvenliği</span></h1>
+    <div class="grid3">
+      <div class="card"><div class="ic" style="margin-bottom:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><rect x="5" y="7" width="14" height="14" rx="2"/></svg></div><div class="gt">Sahipsiz çanta / paket</div><div class="gs">Bekleme salonu veya ATM kabininde unutulan şüpheli paketler tespit edilir.</div></div>
+      <div class="card"><div class="ic" style="margin-bottom:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4l6 6-8 8H6v-6z"/></svg></div><div class="gt">Saldırı aracı tespiti</div><div class="gs">Tornavida, levye, matkap, sprey boya gibi ATM’ye yönelik tehdit nesneleri yakalanır.</div></div>
+      <div class="card"><div class="ic" style="margin-bottom:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20c2-6 6-9 8-9s6 3 8 9"/><circle cx="12" cy="8" r="3"/></svg></div><div class="gt">Barınma ve uyuma</div><div class="gs">Yere yatan, uyku tulumu seren veya uzun süre hareketsiz kalan kişiler işaretlenir.</div></div>
+    </div>
+    <div class="pcard" style="margin-top:14px">
+      <div class="ph"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="8" width="16" height="12" rx="2"/></svg></div><div class="pt">ATM ağı · son 30 gün</div><div class="live"><span class="d"></span>6 kabin izleniyor</div></div>
+      <div class="pgrid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="pm"><div class="v">7</div><div class="l">Sahipsiz paket</div></div>
+        <div class="pm"><div class="v">3</div><div class="l">Saldırı aracı</div></div>
+        <div class="pm"><div class="v">12</div><div class="l">Barınma / uyuma</div></div>
+        <div class="pm"><div class="v">6</div><div class="l">İzlenen ATM</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 PANEL NASIL -->
+  <section class="slide" data-sec="panel">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Panel nasıl kullanılır</div></div>
+    <div class="eyebrow"><span class="dot"></span>Yönetim Paneli</div>
+    <h1>Tek ekran. Sol menüden <span class="amb">tüm banka.</span></h1>
+    <p class="lead">Panel intranet’te açılır. Üstten şube filtresi, soldan sayfa, sağ üstten canlı bildirim. Her kullanıcı yalnızca yetkili olduğu kapsamı görür.</p>
+    <div class="map">
+      <div class="m"><div class="g">Her sabah</div><div class="gt">Genel Bakış</div><div class="gs">Net ziyaretçi, bekleme, açık kritik alarm, SLA ve günlük rapor.</div></div>
+      <div class="m"><div class="g">Olay anı</div><div class="gt">Alarm Merkezi</div><div class="gs">Tüm modüllerden gelen olaylar, kamera karesi ile birlikte. Filtrele, kapat, ata.</div></div>
+      <div class="m"><div class="g">Yapay zeka</div><div class="gt">5 modül ekranı</div><div class="gs">Dolandırıcılık, müşteri, operasyon, nakit, ATM. Her biri kendi KPI ve kaydını tutar.</div></div>
+      <div class="m"><div class="g">Altyapı</div><div class="gt">Kameralar ve şubeler</div><div class="gs">Hangi kamera hangi modüle bağlı, hangi şube canlı.</div></div>
+      <div class="m"><div class="g">Yönetim</div><div class="gt">Kullanıcı ve yetkiler</div><div class="gs">RBAC matrisi, e-posta / SMS kanalı, kapsam (tüm ağ / bölge / şube).</div></div>
+      <div class="m"><div class="g">Canlı demo</div><div class="gt">P tuşu</div><div class="gs">Sunumun içinde <b>bankshypevision.netlify.app</b> açılır. Esc ile sunuma dönün.</div></div>
+    </div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:14px">
+      <button class="cta" onclick="openPanel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 3h18v14H3zM8 21h8M12 17v4"/></svg>Canlı paneli aç</button>
+      <a class="cta" href="https://bankshypevision.netlify.app/" target="_blank" rel="noopener" style="text-decoration:none;background:#1f2226;color:#fff;box-shadow:none">Yeni sekmede aç</a>
+    </div>
+  </section>
+
+  <!-- 14 GENEL BAKIŞ -->
+  <section class="slide tight" data-sec="panel">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Genel Bakış</div></div>
+    <div class="eyebrow"><span class="dot"></span>1 · Genel Bakış nasıl kullanılır</div>
+    <h1>Güne buradan başlanır</h1>
+    <div class="split-shot">
+      <ol class="how">
+        <li><span class="hn">1</span><div><b>Üst KPI şeridi</b> — Net ziyaretçi 5.425 · bekleme 7,4 dk · açık kritik 1 · SLA %94,1. Kırmızı kart varsa önce oraya gidin.</div></li>
+        <li><span class="hn">2</span><div><b>Modül kartları</b> — Son 24 saatte hangi zeka katmanı olay üretti: dolandırıcılık 4, operasyon 13, nakit 5, ATM 6.</div></li>
+        <li><span class="hn">3</span><div><b>Saatlik trafik</b> — Personel çizgisi ayrı, müşteri çizgisi ayrı. Öğle yoğunluğunu gişe planına bağlayın.</div></li>
+        <li><span class="hn">4</span><div><b>Alarm dağılımı</b> — 24 saatin pasta özeti. Tek tıkla Alarm Merkezi’ne inilir.</div></li>
+        <li><span class="hn">5</span><div><b>Günlük rapor</b> — Sağ üstten PDF/özet alınır; genel müdürlük sabah brifingine gider.</div></li>
+      </ol>
+      <div class="shot"><img src="panel/01-genel-bakis.png" alt="HypeVision Genel Bakış"></div>
+    </div>
+  </section>
+
+  <!-- 15 ALARM MERKEZİ -->
+  <section class="slide tight" data-sec="panel">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Alarm Merkezi</div></div>
+    <div class="eyebrow"><span class="dot"></span>2 · Alarm Merkezi nasıl kullanılır</div>
+    <h1>Olay + kamera karesi, aynı satırda</h1>
+    <div class="split-shot">
+      <ol class="how">
+        <li><span class="hn">1</span><div><b>Açık 7 · Kritik 1 · Kapatılan 26</b> — Yanlış alarm oranı %5,7. Operatör önce kırmızı (kritik) karta bakar.</div></li>
+        <li><span class="hn">2</span><div><b>Arama ve filtre</b> — Alarm no, kamera, şube. Modül, seviye ve durum ile daraltılır.</div></li>
+        <li><span class="hn">3</span><div><b>Görsel ızgara</b> — Her kartta anlık kare, süre ve açıklama: kuyruk 14 dk, bankoda açık nakit, gişe bekleme 8,9 dk.</div></li>
+        <li><span class="hn">4</span><div><b>Ne yapılır</b> — Kartı aç, canlı yayına geç, şube müdürüne ata veya kapat. Kritikte SMS/e-posta otomatik gider.</div></li>
+      </ol>
+      <div class="shot"><img src="panel/02-alarm-merkezi.png" alt="HypeVision Alarm Merkezi"></div>
+    </div>
+  </section>
+
+  <!-- 16 MODÜL EKRANLARI -->
+  <section class="slide tight" data-sec="panel">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Modül ekranları</div></div>
+    <div class="eyebrow"><span class="dot"></span>3 · Üç operasyon ekranı</div>
+    <h1>Sol menüden modüle girin, KPI’yı okuyun, kaydı yönetin</h1>
+    <div class="shots3">
+      <div>
+        <div class="shot" style="height:168px;margin-bottom:8px"><img src="panel/03-dolandiricilik.png" alt="Dolandırıcılık Önleme"></div>
+        <div class="gt">Dolandırıcılık</div>
+        <div class="gs">Kara listeye kişi ekle. Eşleşme 1,4 sn’de pop-up. Sağda uyarı akışı, tabloda kim / kategori / son görülme.</div>
+      </div>
+      <div>
+        <div class="shot" style="height:168px;margin-bottom:8px"><img src="panel/04-musteri.png" alt="Müşteri İçgörüsü"></div>
+        <div class="gt">Müşteri içgörüsü</div>
+        <div class="gs">Net müşteri, personel hariç. Haftalık karşılaştırma ve cinsiyet / yaş dağılımı şube planına gider.</div>
+      </div>
+      <div>
+        <div class="shot" style="height:168px;margin-bottom:8px"><img src="panel/05-operasyon.png" alt="Operasyonel Verimlilik"></div>
+        <div class="gt">Operasyon</div>
+        <div class="gs">Bekleme eğrisi kırmızı KPI çizgisini keserse uyarı. Gişe etkileşim süresi ve SLA %94,8.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 17 NAKİT + ATM -->
+  <section class="slide tight" data-sec="panel">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Nakit ve ATM</div></div>
+    <div class="eyebrow"><span class="dot"></span>4 · Güvenlik ekranları</div>
+    <h1>Vezne ve kabin, kamera ile birlikte izlenir</h1>
+    <div class="shots2">
+      <div>
+        <div class="shot" style="height:190px;margin-bottom:8px"><img src="panel/06-nakit.png" alt="Nakit ve Banko Güvenliği"></div>
+        <div class="gt">Nakit ve banko</div>
+        <div class="gs">60 sn’den fazla sahipsiz nakit → sessiz alarm. Haftalık olay çubuğu ve her veznenin canlı karesi / durumu.</div>
+      </div>
+      <div>
+        <div class="shot" style="height:190px;margin-bottom:8px"><img src="panel/07-atm.png" alt="ATM ve Nesne Güvenliği"></div>
+        <div class="gt">ATM ve nesne</div>
+        <div class="gs">Sahipsiz paket, levye / matkap / sprey, barınma. Kabin kartında kırmızı kutu ve son olay süresi.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 18 YETKİLER -->
+  <section class="slide tight" data-sec="panel">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Kullanıcı ve yetkiler</div></div>
+    <div class="eyebrow"><span class="dot"></span>5 · Kim neyi görür</div>
+    <h1>RBAC: her rol kendi kapsamını görür</h1>
+    <div class="split-shot">
+      <ol class="how">
+        <li><span class="hn">1</span><div><b>Genel Müdürlük</b> — Tüm şube verisi, alarm, kara liste ve kullanıcı yönetimi.</div></li>
+        <li><span class="hn">2</span><div><b>Bölge Müdürü</b> — Yalnız bağlı şubeler. Kara listeyi göremez / yönetemez.</div></li>
+        <li><span class="hn">3</span><div><b>Şube Müdürü</b> — Kendi şubesinin anlık alarmı ve yoğunluğu.</div></li>
+        <li><span class="hn">4</span><div><b>Güvenlik</b> — Kendi şube alarmı. Performans grafiği ve kullanıcı yönetimi kapalı.</div></li>
+        <li><span class="hn">5</span><div><b>Bildirim</b> — Kullanıcı bazında e-posta ve SMS aç/kapa. Kritik alarm seçilen kanala düşer.</div></li>
+      </ol>
+      <div class="shot"><img src="panel/08-yetkiler.png" alt="Kullanıcı ve Yetkiler"></div>
+    </div>
+  </section>
+
+  <!-- 19 MİMARİ -->
+  <section class="slide" data-sec="mimari">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Teknik mimari</div></div>
+    <div class="eyebrow"><span class="dot"></span>Teknik Mimari ve Kurulum</div>
+    <h1>Hareket algılama değil, <span class="amb">derin öğrenme</span></h1>
+    <div class="grid3">
+      <div class="card"><div class="gt">Donanım bağımsız</div><div class="gs" style="margin-top:8px">Yazılım, markadan bağımsız mevcut IP kameralarla (RTSP) entegre çalışır. Yeni kamera yatırımı gerekmez.</div></div>
+      <div class="card"><div class="gt">Computer vision</div><div class="gs" style="margin-top:8px">Basit motion detection değil; nesneleri, yüzleri ve insanları tanımlayan derin öğrenme motoru.</div></div>
+      <div class="card"><div class="gt">On-premise / KVKK</div><div class="gs" style="margin-top:8px">Verilerin güvenliği için sistem bankanın kendi yerel sunucularında çalışacak şekilde tasarlanmıştır.</div></div>
+    </div>
+    <div class="close"><div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="#1f2226" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div><div class="ct">Görüntü bankanın sınırından çıkmaz. Yetki matrisi, log ve erişim kaydı bankanın güvenlik politikasına bağlanır.</div></div>
+  </section>
+
+  <!-- 20 AKSİYON -->
+  <section class="slide" data-sec="mimari">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">Aksiyon planı</div></div>
+    <div class="eyebrow"><span class="dot"></span>Başlangıç</div>
+    <h1>Süreci başlatmak için <span class="amb">dört adım</span></h1>
+    <div class="act">
+      <div class="card"><div class="n">1</div><div class="gt">Şube seçimi</div><div class="gs">Teknik altyapısı ve müşteri profili uygun bir pilot şubenin bildirilmesi.</div></div>
+      <div class="card"><div class="n">2</div><div class="gt">Keşif ve kalibrasyon</div><div class="gs">HypeVision ekibinin kameraları incelemesi, açı düzenlemesi ve config dosyasını hazırlaması.</div></div>
+      <div class="card"><div class="n">3</div><div class="gt">Sistem kurulumu</div><div class="gs">Sunucu kurulumu ve kameraların yapay zekâ motoruna bağlanması.</div></div>
+      <div class="card"><div class="n">4</div><div class="gt">Teslim</div><div class="gs">Yönetim paneli eğitimleri ve sistemin canlıya alınması.</div></div>
+    </div>
+    <div class="close"><div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="#1f2226" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg></div><div class="ct">İlk gün <b>bağlanır</b>, ilk hafta <b>ilk kara liste eşleşmenizi</b> ve kuyruk darboğazınızı görürsünüz.</div></div>
+  </section>
+
+  <!-- 21 KAPANIŞ -->
+  <section class="slide cover" data-sec="mimari">
+    <div class="brand"><div class="logo"><div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/></svg></div><div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div></div><div class="site">HypeVision</div></div>
+    <div class="grid2" style="align-items:center">
+      <div>
+        <div class="eyebrow"><span class="dot"></span>İletişim</div>
+        <h1>Şubenizi <span class="amb">gören</span> hale getirelim</h1>
+        <p class="lead">Pilot şube, keşif ve canlıya alma için HypeVision ekibi hazır.</p>
+        <div class="contact">
+          <a href="https://maps.google.com/?q=Muallimkoy+Mah.+Deniz+Cd.+No+143/5+Gebze+Kocaeli" target="_blank" rel="noopener">
+            <div class="cix" style="background:#e7f7ee"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a9a5f" stroke-width="2"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+            <div style="flex:1"><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#a79668">ADRES</div><div style="font-weight:700;margin-top:2px;font-size:13px;line-height:1.4">Muallimköy Mh. Deniz Cd. No: 143/5<br>Gebze / Kocaeli</div></div>
+          </a>
+        </div>
+      </div>
+      <div class="khero" style="padding:0">
+        <div class="big"><svg viewBox="0 0 24 24" fill="none" stroke="#F5B301" stroke-width="2"><path d="M4 20h16"/><path d="M4 16l4-4 4 3 5-7"/><circle cx="8" cy="12" r="1.3" fill="#F5B301" stroke="none"/><circle cx="17" cy="8" r="1.5" fill="#F5B301" stroke="none"/></svg></div>
+        <div class="wm"><span class="a">Hype</span><span class="b">Vision</span></div>
+        <div class="tag">Bankacılık güvenlik ve operasyonel zeka</div>
+        <p class="lead" style="margin-bottom:0">HypeVision</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="hint">← →  ·  F tam ekran  ·  P panel</div>
+  <div class="phonenav">
+    <button type="button" class="pn" onclick="goRel(-1)" aria-label="Önceki">‹</button>
+    <button type="button" class="pn" onclick="goRel(1)" aria-label="Sonraki">›</button>
   </div>
-  <h1>İki ayrı sunum</h1>
-  <p>Bankacılık veya perakende kasa fraud. Birini seçin.</p>
-  <div class="grid">
-    <a class="card" href="banka.html">
-      <div class="k">01 · Banka</div>
-      <div class="t">Bankacılık</div>
-      <div class="d">Şube, ATM, kara liste, kuyruk, nakit ve yönetim paneli.</div>
-      <div class="go">Sunumu aç →</div>
-    </a>
-    <a class="card" href="fraud.html">
-      <div class="k">02 · Perakende</div>
-      <div class="t">Kasa Fraud</div>
-      <div class="d">POS / SAP fişi ile kasa kamerası. İptal, iade, hayali satış.</div>
-      <div class="go">Sunumu aç →</div>
-    </a>
+  <nav class="navbar">
+    <button class="nb on" data-go="0" data-sec="giris"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg><span class="nl">Giriş</span></button>
+    <button class="nb" data-go="7" data-sec="modul"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg><span class="nl">Modüller</span></button>
+    <button class="nb" data-go="13" data-sec="panel"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v14H3zM8 21h8M12 17v4"/></svg><span class="nl">Panel</span></button>
+    <button class="nb" data-go="19" data-sec="mimari"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="nl">Mimari</span></button>
+  </nav>
+
+  <div id="panelApp">
+    <div class="livebar">
+      <div class="lb-brand">
+        <span class="dotg"></span>
+        <b>hypevision</b>
+        <span>canlı panel</span>
+      </div>
+      <a class="lb-link" href="https://bankshypevision.netlify.app/" target="_blank" rel="noopener">Yeni sekmede aç</a>
+      <button class="xbtn" onclick="closePanel()" title="Kapat" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <iframe id="panelFrame" title="HypeVision canlı panel" src="about:blank" allow="fullscreen" referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
 </div>
+</div>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.stage > .slide'));
+  var total=slides.length, i=0;
+  var pbar=document.getElementById('pbar'), secLbl=document.getElementById('secLbl'), cnt=document.getElementById('cnt');
+  var nbs=[].slice.call(document.querySelectorAll('.navbar .nb'));
+  var lbl={giris:'Giriş',modul:'Modüller',panel:'Panel',mimari:'Mimari'};
+  function go(n){
+    i=Math.max(0,Math.min(total-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i);});
+    var sec=slides[i].getAttribute('data-sec');
+    secLbl.textContent=lbl[sec]||'Giriş';
+    cnt.textContent=(i+1)+' / '+total;
+    pbar.style.width=((i+1)/total*100)+'%';
+    nbs.forEach(function(b){
+      var gs=b.getAttribute('data-sec');
+      var on=false;
+      if(gs==='giris') on=i<=6;
+      else if(gs==='modul') on=i>=7&&i<=12;
+      else if(gs==='panel') on=i>=13&&i<=18;
+      else if(gs==='mimari') on=i>=19;
+      b.classList.toggle('on',on);
+    });
+  }
+  window.go=go;
+  window.goRel=function(d){go(i+d);};
+  nbs.forEach(function(b){
+    b.addEventListener('click',function(){
+      go(+b.getAttribute('data-go'));
+    });
+  });
+  var PANEL_URL='https://bankshypevision.netlify.app/';
+  window.openPanel=function(){
+    var frame=document.getElementById('panelFrame');
+    if(frame && frame.getAttribute('src')!==PANEL_URL) frame.src=PANEL_URL;
+    document.getElementById('panelApp').classList.add('on');
+    document.body.classList.add('pa-open');
+  };
+  window.closePanel=function(){
+    document.getElementById('panelApp').classList.remove('on');
+    document.body.classList.remove('pa-open');
+  };
+  window.addEventListener('keydown',function(e){
+    if(e.key==='Escape'&&document.body.classList.contains('pa-open')){closePanel();return;}
+    if(document.body.classList.contains('pa-open')) return;
+    if(e.key==='ArrowRight'||e.key===' ' ||e.key==='PageDown'){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    if(e.key==='Home') go(0);
+    if(e.key==='End') go(total-1);
+    if(e.key==='f'||e.key==='F'){
+      if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+    if(e.key==='p'||e.key==='P') openPanel();
+  });
+  var sx=0;
+  document.getElementById('stage').addEventListener('touchstart',function(e){sx=e.changedTouches[0].clientX;},{passive:true});
+  document.getElementById('stage').addEventListener('touchend',function(e){
+    if(document.body.classList.contains('pa-open')) return;
+    var dx=e.changedTouches[0].clientX-sx;
+    if(dx<-50) go(i+1); if(dx>50) go(i-1);
+  });
+  go(0);
+})();
+</script>
 </body>
 </html>
